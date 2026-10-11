@@ -28,9 +28,9 @@ public final class VacationPlanner {
             total += request.minutes(contractMinutes);
         }
         if (total >= contractMinutes) {
-            LocalDateTime dayStart = sorted.get(0).start();
-            LocalDateTime dayEnd = sorted.get(sorted.size() - 1).end();
-            return List.of(new Activity(VACATION, dayStart, dayEnd, false));
+            LocalDateTime dayStart = sorted.get(0).getStart();
+            LocalDateTime dayEnd = sorted.get(sorted.size() - 1).getEnd();
+            return Collections.singletonList(new Activity(VACATION, dayStart, dayEnd, false));
         }
 
         List<Activity> result = sorted;
@@ -38,9 +38,9 @@ public final class VacationPlanner {
             int remaining = request.minutes(contractMinutes);
 
             // 점심 같은 휴게 구간은 근무시간이 아니므로 차감 대상에서 뺀다
-            List<Activity> workActivities = new ArrayList<>();
+            List<Activity> workActivities = new ArrayList<Activity>();
             for (Activity activity : result) {
-                if (activity.work()) {
+                if (activity.isWork()) {
                     workActivities.add(activity);
                 }
             }
@@ -49,14 +49,14 @@ public final class VacationPlanner {
                 Collections.reverse(workActivities);
             }
 
-            List<Activity> vacations = new ArrayList<>();
+            List<Activity> vacations = new ArrayList<Activity>();
             for (Activity activity : workActivities) {
                 if (remaining == 0) {
                     break;
                 }
                 long take = Math.min(remaining, activity.minutes());
-                LocalDateTime start = fromEnd ? activity.end().minusMinutes(take) : activity.start();
-                LocalDateTime end = fromEnd ? activity.end() : activity.start().plusMinutes(take);
+                LocalDateTime start = fromEnd ? activity.getEnd().minusMinutes(take) : activity.getStart();
+                LocalDateTime end = fromEnd ? activity.getEnd() : activity.getStart().plusMinutes(take);
                 vacations.add(new Activity(VACATION, start, end, false));
                 remaining -= (int) take;
             }

@@ -29,11 +29,15 @@ public enum VacationType {
             throw new IllegalArgumentException("소정근로시간은 0보다 커야 합니다.");
         }
         double half = contractMinutes / 2.0;
-        return switch (this) {
-            case FULL_DAY -> contractMinutes;
-            case AM_HALF -> (int) Math.floor(half / 30) * 30;
-            case PM_HALF -> (int) Math.ceil(half / 30) * 30;
-            case AM_QUARTER, PM_QUARTER -> QUARTER_MINUTES;
-        };
+        switch (this) {
+            case FULL_DAY:
+                return contractMinutes;
+            case AM_HALF:
+                return (int) Math.floor(half / 30) * 30;
+            case PM_HALF:
+                return (int) Math.ceil(half / 30) * 30;
+            default:
+                return QUARTER_MINUTES;
+        }
     }
 }

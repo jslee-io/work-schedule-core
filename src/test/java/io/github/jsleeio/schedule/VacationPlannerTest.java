@@ -4,6 +4,8 @@ import static io.github.jsleeio.schedule.ScheduleEditorTest.assertSchedule;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,13 +13,13 @@ import org.junit.jupiter.api.Test;
 class VacationPlannerTest {
 
     // 소정근로 8시간 근무표
-    private static final List<Activity> EIGHT_HOURS = List.of(
+    private static final List<Activity> EIGHT_HOURS = Arrays.asList(
             Activity.work("상담", "09:00", "12:00"),
             Activity.rest("점심", "12:00", "13:00"),
             Activity.work("상담", "13:00", "18:00"));
 
     // 소정근로 10시간 30분 철야조 근무표
-    private static final List<Activity> OVERNIGHT = List.of(
+    private static final List<Activity> OVERNIGHT = Arrays.asList(
             Activity.work("상담", "20:00", "익일 02:00"),
             Activity.rest("휴게", "익일 02:00", "익일 03:00"),
             Activity.work("상담", "익일 03:00", "익일 07:30"));
@@ -25,7 +27,7 @@ class VacationPlannerTest {
     @Test
     @DisplayName("오전반차는 근무 시작부터 차감하고 점심은 건너뛴다")
     void morningHalfSkipsLunch() {
-        List<Activity> result = VacationPlanner.apply(EIGHT_HOURS, 480, List.of(VacationType.AM_HALF));
+        List<Activity> result = VacationPlanner.apply(EIGHT_HOURS, 480, Arrays.asList(VacationType.AM_HALF));
 
         assertSchedule(result,
                 "09:00-12:00 휴가",
@@ -37,7 +39,7 @@ class VacationPlannerTest {
     @Test
     @DisplayName("오후반반차는 근무 종료 쪽에서 2시간을 차감한다")
     void afternoonQuarterFromEnd() {
-        List<Activity> result = VacationPlanner.apply(EIGHT_HOURS, 480, List.of(VacationType.PM_QUARTER));
+        List<Activity> result = VacationPlanner.apply(EIGHT_HOURS, 480, Arrays.asList(VacationType.PM_QUARTER));
 
         assertSchedule(result,
                 "09:00-12:00 상담",
@@ -50,7 +52,7 @@ class VacationPlannerTest {
     @DisplayName("오전반차와 오후반반차가 함께 오면 사이의 근무는 남는다")
     void morningHalfAndAfternoonQuarterKeepMiddleWork() {
         List<Activity> result = VacationPlanner.apply(
-                EIGHT_HOURS, 480, List.of(VacationType.AM_HALF, VacationType.PM_QUARTER));
+                EIGHT_HOURS, 480, Arrays.asList(VacationType.AM_HALF, VacationType.PM_QUARTER));
 
         assertSchedule(result,
                 "09:00-12:00 휴가",
@@ -64,7 +66,7 @@ class VacationPlannerTest {
     @DisplayName("오전반차와 오후반차는 시간이 이어지지 않아도 합계로 종일휴가가 된다")
     void twoHalvesBecomeFullDay() {
         List<Activity> result = VacationPlanner.apply(
-                EIGHT_HOURS, 480, List.of(VacationType.AM_HALF, VacationType.PM_HALF));
+                EIGHT_HOURS, 480, Arrays.asList(VacationType.AM_HALF, VacationType.PM_HALF));
 
         assertSchedule(result, "09:00-18:00 휴가");
     }
@@ -72,7 +74,7 @@ class VacationPlannerTest {
     @Test
     @DisplayName("종일휴가는 근무 시작부터 종료까지 휴가 한 건이 된다")
     void fullDayIsSingleVacation() {
-        List<Activity> result = VacationPlanner.apply(EIGHT_HOURS, 480, List.of(VacationType.FULL_DAY));
+        List<Activity> result = VacationPlanner.apply(EIGHT_HOURS, 480, Arrays.asList(VacationType.FULL_DAY));
 
         assertSchedule(result, "09:00-18:00 휴가");
     }
@@ -90,7 +92,7 @@ class VacationPlannerTest {
     @Test
     @DisplayName("10.5시간 철야조의 오전반차는 근무 시작부터 5시간을 차감한다")
     void overnightMorningHalf() {
-        List<Activity> result = VacationPlanner.apply(OVERNIGHT, 630, List.of(VacationType.AM_HALF));
+        List<Activity> result = VacationPlanner.apply(OVERNIGHT, 630, Arrays.asList(VacationType.AM_HALF));
 
         assertSchedule(result,
                 "20:00-익일 01:00 휴가",
@@ -102,7 +104,7 @@ class VacationPlannerTest {
     @Test
     @DisplayName("10.5시간 철야조의 오후반차는 근무 종료 쪽에서 5.5시간을 차감한다")
     void overnightAfternoonHalf() {
-        List<Activity> result = VacationPlanner.apply(OVERNIGHT, 630, List.of(VacationType.PM_HALF));
+        List<Activity> result = VacationPlanner.apply(OVERNIGHT, 630, Arrays.asList(VacationType.PM_HALF));
 
         assertSchedule(result,
                 "20:00-익일 01:00 상담",
@@ -115,20 +117,20 @@ class VacationPlannerTest {
     @DisplayName("휴가 목록이 비었거나 소정근로시간이 0 이하면 막는다")
     void rejectsInvalidInput() {
         assertThrows(IllegalArgumentException.class,
-                () -> VacationPlanner.apply(EIGHT_HOURS, 480, List.of()));
+                () -> VacationPlanner.apply(EIGHT_HOURS, 480, Collections.<VacationType>emptyList()));
         assertThrows(IllegalArgumentException.class,
-                () -> VacationPlanner.apply(EIGHT_HOURS, 0, List.of(VacationType.AM_HALF)));
+                () -> VacationPlanner.apply(EIGHT_HOURS, 0, Arrays.asList(VacationType.AM_HALF)));
     }
 
     @Test
     @DisplayName("차감할 근무시간이 부족하면 막는다")
     void rejectsWhenNotEnoughWork() {
-        List<Activity> shortDay = List.of(
+        List<Activity> shortDay = Arrays.asList(
                 Activity.work("상담", "09:00", "10:00"),
                 Activity.rest("점심", "10:00", "13:00"));
 
         // 소정근로 8시간 기준 오전반차 4시간을 1시간짜리 근무에서 뺄 수 없다
         assertThrows(IllegalArgumentException.class,
-                () -> VacationPlanner.apply(shortDay, 480, List.of(VacationType.AM_HALF)));
+                () -> VacationPlanner.apply(shortDay, 480, Arrays.asList(VacationType.AM_HALF)));
     }
 }

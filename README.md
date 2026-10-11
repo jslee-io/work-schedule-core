@@ -85,7 +85,7 @@ src/test/java/io/github/jsleeio/schedule/
 
 ## 실행 방법
 
-필요 환경: JDK 17 이상, Maven 3.8 이상
+필요 환경: JDK 8 이상, Maven 3.8 이상
 
 ```bash
 # 테스트 실행
@@ -98,11 +98,11 @@ java -cp target/classes io.github.jsleeio.schedule.Example
 
 IDE(Eclipse, IntelliJ)에서는 Maven 프로젝트로 가져온 뒤 `Example`의 `main`을 실행하면 됩니다.
 
-저장소에 코드가 올라가면 GitHub Actions가 JDK 17 환경에서 `mvn test`를 실행합니다. 결과는 저장소의 Actions 탭에서 확인할 수 있습니다.
+저장소에 코드가 올라가면 GitHub Actions가 JDK 8 환경에서 `mvn test`를 실행합니다. 결과는 저장소의 Actions 탭에서 확인할 수 있습니다.
 
 ## 테스트
 
-테스트 이름이 곧 처리 규칙이 되도록 작성했습니다. JDK 17, JUnit 5.10.1 기준 25개 테스트가 모두 통과합니다.
+테스트 이름이 곧 처리 규칙이 되도록 작성했습니다. JDK 8, JUnit 5.10.1 기준 25개 테스트가 모두 통과합니다.
 
 **ScheduleEditorTest**
 
@@ -139,7 +139,7 @@ IDE(Eclipse, IntelliJ)에서는 Maven 프로젝트로 가져온 뒤 `Example`의
 
 | 구분 | 실무 | 이 예제 |
 | --- | --- | --- |
-| 기술 | Java, Spring Framework(전자정부프레임워크), MyBatis, Oracle, Nexacro N24 | Java 17, JUnit 5 |
+| 기술 | Java, Spring Framework(전자정부프레임워크), MyBatis, Oracle, Nexacro N24 | Java 8, JUnit 5 |
 | 저장 | 근무활동 행을 DB에서 수정, 삭제, 삽입하고, 변경 이력을 남기며, 오류 시 전체 롤백 | 메모리의 리스트로 계산만 수행 |
 | 입력 | 30분 단위 시간표 화면에서 드래그앤드롭, 시간 변경 팝업 | 메서드 호출 |
 | 코드 | 회사 소스 | 처음부터 새로 설계 (클래스 구조, 시간 표현 방식 모두 실무와 무관) |
